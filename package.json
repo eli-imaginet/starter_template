@@ -21,16 +21,23 @@
 	"devDependencies": {
 		"colors": "^1.4.0",
 		"gulp": "^4.0.2",
+		"gulp-autoprefixer": "^7.0.1",
 		"gulp-clean": "^0.4.0",
 		"gulp-cli": "^2.2.0",
+		"gulp-concat": "^2.6.1",
 		"gulp-download-files": "0.0.3",
 		"gulp-exec": "^4.0.0",
 		"gulp-npm-dist": "^1.0.3",
 		"gulp-rename": "^1.4.0",
-		"gulp-unzip": "^1.1.0"
+		"gulp-sass": "^4.0.2",
+		"gulp-sourcemaps": "^2.6.5",
+		"gulp-uglify": "^3.0.2",
+		"gulp-unzip": "^1.1.0",
+		"yargs": "^14.2.0"
 	},
 	"dependencies": {
 		"bootstrap": "<5",
-		"jquery": "<4"
+		"jquery": "<4",
+		"test": "^0.6.0"
 	}
 }

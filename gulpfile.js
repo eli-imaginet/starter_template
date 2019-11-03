@@ -6,9 +6,28 @@ const rename = require("gulp-rename");
 const download = require("gulp-download-files");
 const unzip = require("gulp-unzip");
 const clean = require("gulp-clean");
+const concat = require("gulp-concat");
+const uglify = require("gulp-uglify");
+const sass = require("gulp-sass");
+const sourcemaps = require("gulp-sourcemaps");
+const autoprefixer = require("gulp-autoprefixer");
+const argv = require("yargs").argv;
+const fs = require("fs");
 
 const wpUrl = "https://wordpress.org/latest.zip";
-const cleanUpDirs = ['./downloads/', './wordpress/']
+const cleanUpDirs = ["./downloads/", "./wordpress/"];
+const assetsBase = "assets";
+
+const coreJsResources = [
+	`./${assetsBase}/jquery/jquery.min.js`,
+	`./${assetsBase}/bootstrap/js/bootstrap.min.js`
+];
+
+const wpStyleFileContent = `/*
+	Theme Name: Starter Template
+	Version: 1.0
+	Author: Imaginet Studio
+*/`;
 
 function test(cb) {
 	// console.log(argv);
@@ -22,11 +41,34 @@ function test(cb) {
 	// });
 }
 
+function notify(notifyObject) {
+	const { errorText, instructions, successText } = notifyObject;
+	console.log("\033[2J");
+	if (successText) {
+		console.log(successText.white.bgGreen + "\n");
+	}
+	if (errorText) {
+		console.log(errorText.white.bgRed + "\n");
+	}
+	if (instructions) {
+		console.log("\n" + instructions.black.bgYellow);
+	}
+}
+
 function add(cb) {
-	const packageName = process.argv
-		.pop()
-		.split("--p=")
-		.pop();
+	const packageName = argv.p || null;
+	if (!packageName) {
+		const notifyObject = {
+			errorText: "Please Provide A Valid NPM Package Name!",
+			instructions:
+				"Should be executed as: " +
+				"\n" +
+				"npm run add -- -p={packgage-name}"
+		};
+		notify(notifyObject);
+		cb();
+		return;
+	}
 	exec(`npm i ${packageName}`, function(err, stdout, stderr) {
 		console.log(stdout);
 		console.log(stderr);
@@ -38,7 +80,14 @@ function add(cb) {
 						.replace(/\\dist/, "");
 				})
 			)
-			.pipe(gulp.dest("./lib"));
+			.pipe(gulp.dest("assets"));
+		notify({
+			successText: `Package ${packageName} successfully installed and moved to assets dir`,
+			instructions:
+				`Please don't forget to add your file to core resource arrays and run:` +
+				"\n" +
+				"npm run gulp compileAll"
+		});
 		cb();
 	});
 }
@@ -53,40 +102,59 @@ function moveToAssets() {
 			})
 		)
 		.pipe(
-			gulp.dest("./lib").on("end", () => {
+			gulp.dest(assetsBase).on("end", () => {
+				js();
 				console.log("Assets moved");
 			})
 		);
 }
 
+function js() {
+	gulp.src(coreJsResources)
+		.pipe(concat("assets.min.js"))
+		.pipe(uglify())
+		.pipe(gulp.dest("./"));
+}
+
 function templateInit(cb) {
 	moveToAssets();
-	download(wpUrl)
-		.pipe(gulp.dest("downloads/"))
-		.on("end", () => {
-			gulp.src("./downloads/latest.zip")
-				.pipe(unzip())
-				.pipe(
-					gulp.dest("./").on("end", () => {
-						gulp.src("./wordpress/*").pipe(
-							gulp.dest("./").on("end", () => {
-								gulp.src(cleanUpDirs).pipe(
-									clean({ force: true })
-								);
-							})
-						);
-						console.log(
-							"Template Initiated Successfully, Good Luck!".white
-								.bgGreen
-						);
-						cb();
-					})
-				);
-		});
+	if (!fs.existsSync("./downloads/latest.zip")) {
+		download(wpUrl)
+			.pipe(gulp.dest("downloads/"))
+			.on("end", () => {
+				gulp.src("./downloads/latest.zip")
+					.pipe(unzip())
+					.pipe(
+						gulp.dest("./").on("end", () => {
+							console.log(
+								"Template Initiated Successfully, Good Luck!"
+									.white.bgGreen
+							);
+							extractWP();
+							cb();
+						})
+					);
+			});
+	} else {
+		extractWP(cb);
+		console.log(
+			"Template Initiated Successfully, Good Luck!".white.bgGreen
+		);
+		cb();
+	}
 	// console.log(stderr);
 }
 
-module.exports = { templateInit, add };
+function extractWP(cb) {
+	gulp.src("./wordpress/**").pipe(
+		gulp.dest("./").on("end", () => {
+			// gulp.src(cleanUpDirs).pipe(clean({ force: true }));
+			cb();
+		})
+	);
+}
+
+module.exports = { templateInit, add, js };
 
 // var gulp = require("gulp"),
 // 	sass = require("gulp-sass"),
