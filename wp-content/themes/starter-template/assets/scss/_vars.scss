@@ -1,0 +1,51 @@
+// colors
+
+$primary-color: #3497ef;
+$text-color: #363636;
+$blue-color: #002f82;
+$blue-color2: #274095;
+$light-blue-color: #1f72b6;
+$orange-color: #f7911f;
+$gray-color: #888888;
+$figure-color: #004474;
+
+// Fonts
+
+$main-font-family: "Montserrat", sans-serif;
+@mixin font-regular {
+    font-family: $main-font-family;
+    font-weight: normal;
+    line-height: 1;
+}
+@mixin font-medium {
+    font-family: $main-font-family;
+    font-weight: 500;
+    line-height: 1;
+}
+@mixin font-light {
+    font-family: $main-font-family;
+    font-weight: 300;
+    line-height: 1;
+}
+
+@mixin font-semi-bold {
+    font-family: $main-font-family;
+    font-weight: 600;
+    line-height: 1;
+}
+
+@mixin font-extra-bold {
+    font-family: $main-font-family;
+    font-weight: 800;
+    line-height: 1;
+}
+
+// Fonts End
+$inner-width: 1200px;
+
+@mixin flex-dir-col-centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
