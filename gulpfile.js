@@ -116,7 +116,18 @@ function js(cb) {
 }
 
 function css(cb) {
-	gulp.src(coreCssResources)
+	_concatCSS().on(
+		"finish",
+		function() {
+			_combineCSSAssetsAndCompiledSass(_compileSass());
+			cb();
+		}.bind(null, cb)
+	);
+}
+
+function _concatCSS() {
+	return gulp
+		.src(coreCssResources)
 		.pipe(concat("style.css"))
 		.pipe(cleanCSS())
 		.pipe(
@@ -125,33 +136,33 @@ function css(cb) {
 			})
 		)
 		.pipe(gap.prependText(cssHeader))
-		.pipe(gulp.dest(templateDir))
-		.on(
-			"finish",
-			function() {
-				gulp.src(`${assetsBase}/scss/style.scss`)
-					.pipe(sourcemaps.init())
-					.pipe(sass())
-					.on("error", function(err) {
-						// console.log(err);
-						console.log("\033[2J");
-						notify({
-							errorText: err.formatted
-						});
-						this.emit("end");
-					})
-					.pipe(cleanCSS())
-					.pipe(concat("style.css"))
-					.pipe(sourcemaps.write("./"))
-					.pipe(gulp.dest(templateDir, { append: true }))
-					.on("finish", function() {
-						notify({
-							successText: `Scss compiled Successfully at ${getCurrentTime()}`
-						});
-					});
-				cb();
-			}.bind(null, cb)
-		);
+		.pipe(gulp.dest(templateDir));
+}
+
+function _compileSass() {
+	return gulp
+		.src(`${assetsBase}/scss/style.scss`)
+		.pipe(sourcemaps.init())
+		.pipe(sass())
+		.on("error", function(err) {
+			console.log("\033[2J");
+			notify({
+				errorText: err.formatted
+			});
+			this.emit("end");
+		});
+}
+
+function _combineCSSAssetsAndCompiledSass(pipe) {
+	pipe.pipe(cleanCSS())
+		.pipe(concat("style.css"))
+		.pipe(sourcemaps.write("./"))
+		.pipe(gulp.dest(templateDir, { append: true }))
+		.on("finish", function() {
+			notify({
+				successText: `Scss compiled Successfully at ${getCurrentTime()}`
+			});
+		});
 }
 
 function getCurrentTime() {
