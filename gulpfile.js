@@ -1,5 +1,8 @@
 const gulp = require("gulp");
-const { series, parallel } = require("gulp");
+const {
+	series,
+	parallel
+} = require("gulp");
 const colors = require("colors");
 const exec = require("child_process").exec;
 const npmDist = require("gulp-npm-dist");
@@ -8,6 +11,7 @@ const download = require("gulp-download-files");
 const unzip = require("gulp-unzip");
 const clean = require("gulp-clean");
 const concat = require("gulp-concat");
+const plumber = require("gulp-plumber");
 const uglify = require("gulp-uglify");
 const cleanCSS = require("gulp-clean-css");
 const sass = require("gulp-sass");
@@ -15,6 +19,9 @@ const sourcemaps = require("gulp-sourcemaps");
 const autoprefixer = require("gulp-autoprefixer");
 const argv = require("yargs").argv;
 const gap = require("gulp-append-prepend");
+const md5 = require("md5");
+const replace = require("gulp-replace");
+const inquirer = require("inquirer");
 const fs = require("fs");
 
 const wpUrl = "https://wordpress.org/latest.zip";
@@ -39,7 +46,11 @@ const coreCssResources = [
 ];
 
 function notify(notifyObject) {
-	const { errorText, instructions, successText } = notifyObject;
+	const {
+		errorText,
+		instructions,
+		successText
+	} = notifyObject;
 	console.log("\033[2J");
 	if (successText) {
 		console.log(successText.bold.white.bgGreen + "\n");
@@ -57,8 +68,7 @@ function add(cb) {
 	if (!packageName) {
 		const notifyObject = {
 			errorText: "Please Provide A Valid NPM Package Name!",
-			instructions:
-				"Should be executed as: " +
+			instructions: "Should be executed as: " +
 				"\n" +
 				"npm run add -- -p={packgage-name}"
 		};
@@ -66,10 +76,12 @@ function add(cb) {
 		cb();
 		return;
 	}
-	exec(`npm i ${packageName}`, function(err, stdout, stderr) {
+	exec(`npm i ${packageName}`, function (err, stdout, stderr) {
 		console.log(stdout);
 		console.log(stderr);
-		gulp.src(npmDist(), { base: "./node_modules" })
+		gulp.src(npmDist(), {
+				base: "./node_modules"
+			})
 			.pipe(
 				rename(path => {
 					path.dirname = path.dirname
@@ -80,8 +92,7 @@ function add(cb) {
 			.pipe(gulp.dest(assetsBase + "/js/"));
 		notify({
 			successText: `Package ${packageName} successfully installed and moved to assets dir`,
-			instructions:
-				`Please don't forget to add your file to core resource arrays and run:` +
+			instructions: `Please don't forget to add your file to core resource arrays and run:` +
 				"\n" +
 				"npm run gulp compileAll"
 		});
@@ -90,7 +101,9 @@ function add(cb) {
 }
 
 function moveToAssets(cb) {
-	gulp.src(npmDist(), { base: "./node_modules" })
+	gulp.src(npmDist(), {
+			base: "./node_modules"
+		})
 		.pipe(
 			rename(path => {
 				path.dirname = path.dirname
@@ -99,12 +112,11 @@ function moveToAssets(cb) {
 			})
 		)
 		.pipe(
-			gulp.dest(assetsBase).on("end", () => {
-				js();
+			gulp.dest(assetsBase).on("end", function () {
+				js(cb);
 				console.log("Assets moved");
-			})
+			}.bind(null, cb))
 		)
-		.on("finish", cb);
 }
 
 function js(cb) {
@@ -116,9 +128,14 @@ function js(cb) {
 }
 
 function css(cb) {
+	if (fs.existsSync(`${templateDir}/style.css.map`)) {
+		gulp.src(`${templateDir}/style.css.map`).pipe(clean({
+			force: true
+		}));
+	}
 	_concatCSS().on(
 		"finish",
-		function() {
+		function () {
 			_combineCSSAssetsAndCompiledSass(_compileSass());
 			cb();
 		}.bind(null, cb)
@@ -139,29 +156,76 @@ function _concatCSS() {
 		.pipe(gulp.dest(templateDir));
 }
 
-function _compileSass() {
+function _compileSass(cb) {
 	return gulp
 		.src(`${assetsBase}/scss/style.scss`)
-		.pipe(sourcemaps.init())
-		.pipe(sass())
-		.on("error", function(err) {
-			console.log("\033[2J");
-			notify({
-				errorText: err.formatted
+		.pipe(plumber({
+			errorHandler: (err) => {
+				global.error = err;
+			}
+		}))
+		.pipe(sourcemaps.init()).on('error', function () {
+			gulp.src(`${assetsBase}/style.css.map`).clean({
+				force: true
 			});
-			this.emit("end");
-		});
+		})
+		.pipe(sass())
+		// 	{
+		// 	onSuccess: () => {
+		// 		notify({
+		// 			successText: `Scss compiled Successfully at ${getCurrentTime()}`
+		// 		});
+		// 	},
+		// 	onError: function (err) {
+		// 		notify({
+		// 			errorText: err.formatted
+		// 		});
+		// 		cb();
+		// 	}
+		// }
+		// .on('error', function (err) {
+		// 	// this.emit('close');
+		// 	// cb();
+		// }.bind(cb))
+		// .on('success', function () {
+		// 	notify({
+		// 		successText: `Scss compiled Successfully at ${getCurrentTime()}`
+		// 	});
+		// })
+		// .on("error", function (err) {
+		// 	// console.log("\033[2J");
+		// 	notify({
+		// 		errorText: err.formatted
+		// 	});
+		// 	cb();
+		// 	// this.emit("end");
+		// }.bind(this, cb))
+		.pipe(cleanCSS())
+		.pipe(concat("style.css"))
+		.pipe(sourcemaps.write("./"))
+		.pipe(gulp.dest(templateDir, {
+			append: true
+		}))
 }
 
 function _combineCSSAssetsAndCompiledSass(pipe) {
 	pipe.pipe(cleanCSS())
 		.pipe(concat("style.css"))
 		.pipe(sourcemaps.write("./"))
-		.pipe(gulp.dest(templateDir, { append: true }))
-		.on("finish", function() {
-			notify({
-				successText: `Scss compiled Successfully at ${getCurrentTime()}`
-			});
+		.pipe(gulp.dest(templateDir, {
+			append: true
+		}))
+		.on("finish", function () {
+			if (!global.error) {
+				notify({
+					successText: `Scss compiled Successfully at ${getCurrentTime()}`
+				});
+			} else {
+				notify({
+					errorText: global.error.formatted
+				});
+			}
+			delete global.error;
 		});
 }
 
@@ -205,7 +269,9 @@ function unzipWP(cb) {
 
 function cleanGarbage(cb) {
 	gulp.src(cleanUpDirs)
-		.pipe(clean({ force: true }))
+		.pipe(clean({
+			force: true
+		}))
 		.on("finish", cb);
 }
 
@@ -215,150 +281,136 @@ function setStarterTemplateInWpContent(cb) {
 		.on("finish", cb);
 }
 
-exports.templateInit = series(
+function setTemplateGenerationStamp(cb) {
+	// inquirer.prompt({
+	// 	name: 'a',
+	// 	type: 'confirm',
+	// 	message: 'Did you copy the template to the server?',
+	// 	choices: ['Yes', 'No']
+	// }).then((answer) => {
+	// 	if (!answer.a) {
+	// 		notify({
+	// 			errorText: 'Please copy the template dir to the server and then init the Atom Config'
+	// 		});
+	// 	} else {
+	fs.readFile('./gulpfile.js', function (err, data) {
+		let fileString = data.toString();
+		const stampMatched = fileString.match('//' + md5('Template Generated'));
+		if (stampMatched) {
+			_atomCreateFtpConfig(cb);
+			// gulp.src("./gulpfile.js").pipe(gap.prependText(`//${md5('Template Generated')}`)).pipe(gulp.dest('./'));
+		}
+		// else {
+		// 	notify({
+		// 		errorText: 'Please copy the template dir to the server and then init the Atom Config'
+		// 	});
+		// 	cb();
+		// }
+	}.bind(null, cb));
+	// }
+	// cb();
+	// });
+}
+
+function _atomCreateFtpConfig(cb) {
+	const ftpconfig = {
+		"protocol": "ftp",
+		"host": "{host}",
+		"port": 21,
+		"user": "{user}",
+		"pass": "{password}",
+		"promptForPass": false,
+		"remote": "/public_html",
+		"local": "",
+		"secure": false,
+		"secureOptions": null,
+		"connTimeout": 10000,
+		"pasvTimeout": 10000,
+		"keepalive": 10000,
+		"watch": [
+			"/wp-content/themes/rimed-theme/css/assets.min.css",
+			"/wp-content/themes/rimed-theme/css/all_assets.min.css",
+			"/wp-content/themes/rimed-theme/js/assets.min.js",
+			"/wp-content/themes/rimed-theme/css/_mobile_menu.scss",
+			"/wp-content/themes/rimed-theme/css/_vars.scss",
+			"/wp-content/themes/rimed-theme/css/responsive.css",
+			"/wp-content/themes/rimed-theme/css/style.css",
+			"/wp-content/themes/rimed-theme/js/scripts.js",
+			"/wp-content/themes/rimed-theme/css/production.min.css",
+			"/wp-content/themes/rimed-theme/js/production.min.js"
+		],
+		"watchTimeout": 500
+	}
+	inquirer.prompt({
+		type: 'confirm',
+		name: 'a',
+		message: 'Did you copy the template to the server first?'
+	}).then((a) => {
+		if (!a.a) {
+			cb();
+			notify({
+				errorText: 
+				`.ftpconfig shoud be generated only after the template files were copied to the server and all server configuration has been made`,
+			})
+			return;
+		}
+		fs.writeFile(`${templateDir}/.ftpconfig`, JSON.stringify(ftpconfig, null, 4), cb);
+	})
+
+}
+
+function init(cb) {
+	const q = [{
+		type: 'list',
+		name: 'action',
+		message: 'What would you like to do today?',
+		choices: [{
+				name: 'Initiate the imaginet starter template',
+				value: 1
+			},
+			{
+				name: 'Add a dependency',
+				value: 2
+			},
+			{
+				name: 'Compile Sass',
+				value: 3
+			},
+			{
+				name: 'Generate Atom ftpconfig',
+				value: 4
+			}
+		]
+	}];
+	inquirer.prompt(q).then((answer) => {
+		switch (answer.action) {
+			case 1:
+				templateInit();
+				break;
+			case 2:
+				break;
+			case 3:
+				watch(cb);
+				break;
+			case 4:
+				_atomCreateFtpConfig(cb);
+				break;
+		}
+	})
+}
+
+templateInit = series(
 	downloadWP,
 	unzipWP,
 	extractWP,
 	setStarterTemplateInWpContent,
-	moveToAssets
+	moveToAssets,
 );
 
 exports.add = add;
 exports.js = js;
 exports.css = css;
 exports.watch = watch;
-
-// var gulp = require("gulp"),
-// 	sass = require("gulp-sass"),
-// 	uglify = require("gulp-uglify"),
-// 	rename = require("gulp-rename"),
-// 	cleanCSS = require("gulp-clean-css"),
-// 	autoprefixer = require("gulp-autoprefixer"),
-// 	concat = require("gulp-concat"),
-// 	rtlcss = require("gulp-rtlcss"),
-// 	notify = require("gulp-notify");
-
-// /*******************************
-//     Define bootstrap Framework
-// *******************************/
-// var tether = "./assets/bootstrap/tether.min.js";
-// var bootstrap_js = "./assets/bootstrap/bootstrap.min.js";
-// var bootstrap_css = "./assets/bootstrap/bootstrap.min.css";
-
-// gulp.task("default", function() {
-// 	console.log("Gulp default started");
-// });
-
-// gulp.task;
-// /**************
-// Development
-// **************/
-// var src_scripts = [
-// 	tether,
-// 	bootstrap_js,
-// 	"./assets/js/jquery.magnific-popup.min.js",
-// 	"./assets/js/slick.min.js",
-// 	"./assets/js/jquery.lazy.min.js",
-// 	"./assets/js/wow.min.js"
-// ];
-
-// gulp.task("js", function() {
-// 	return gulp
-// 		.src(src_scripts)
-// 		.pipe(concat("assets.js"))
-// 		.pipe(gulp.dest("./js/"))
-// 		.pipe(rename("assets.min.js"))
-// 		.pipe(uglify())
-// 		.pipe(gulp.dest("./js/"))
-// 		.pipe(notify("Scripts compiled and minified"));
-// });
-
-// var src_styles = [
-// 	bootstrap_css,
-// 	"./assets/css/assets.min.css",
-// 	"./assets/css/animate.css",
-// 	"./assets/css/magnific-popup.css",
-// 	"./assets/css/slick.css"
-// ];
-
-// gulp.task("css", ["js"], function() {
-// 	return gulp
-// 		.src(src_styles)
-// 		.pipe(concat("all_assets.css"))
-// 		.pipe(gulp.dest("./css/"))
-// 		.pipe(rename("all_assets.min.css"))
-// 		.pipe(cleanCSS())
-// 		.pipe(
-// 			autoprefixer({
-// 				browsers: ["last 2 versions"],
-// 				cascade: false
-// 			})
-// 		)
-// 		.pipe(gulp.dest("./css/"))
-// 		.pipe(notify("Styles compiled and minified"));
-// });
-
-// gulp.task("sass", ["css"], function() {
-// 	gulp.src("./css/style.scss") // the src of the file we want to manipulate
-// 		.pipe(sass()) // in the pipe the file is going to be transformed
-// 		// .pipe(cleanCSS())
-// 		.pipe(
-// 			autoprefixer({
-// 				browsers: ["last 2 versions"],
-// 				cascade: false
-// 			})
-// 		)
-// 		.pipe(gulp.dest("./css/"))
-// 		.pipe(notify("SASS files were manipulated."));
-// });
-
-// gulp.task("development", ["sass"], function() {
-// 	console.log("Development scripts & styles compiled!!!");
-// });
-
-// gulp.task("watch", ["development"], function() {
-// 	gulp.watch("./css/*.scss");
-// });
-
-// /*********************
-//     Production
-// *********************/
-
-// var production_scripts = ["./js/assets.min.js", "./js/scripts.js"];
-
-// gulp.task("production-js", function() {
-// 	return gulp
-// 		.src(production_scripts)
-// 		.pipe(concat("production.min.js"))
-// 		.pipe(gulp.dest("./js/"))
-// 		.pipe(uglify())
-// 		.pipe(gulp.dest("./js/"))
-// 		.pipe(notify("Production script compiled and minified"));
-// });
-
-// var production_styles = [
-// 	"./css/all_assets.min.css",
-// 	"./css/style.min.css",
-// 	"./css/responsive.min.css",
-// 	"./css/rtl-style.css"
-// ];
-
-// gulp.task("production-css", ["production-js"], function() {
-// 	return gulp
-// 		.src(production_styles) // move it to build/css/ directory
-// 		.pipe(rename("production.min.css")) // rename it
-// 		.pipe(cleanCSS()) // minify css
-// 		.pipe(
-// 			autoprefixer({
-// 				browsers: ["last 2 versions"],
-// 				cascade: false
-// 			})
-// 		)
-// 		.pipe(concat("production.min.css"))
-// 		.pipe(gulp.dest("./build/css/")) // move it again to build/clean/ directory
-// 		.pipe(notify("Production style compiled and minified")); // notify message
-// });
-
-// gulp.task("production", ["production-css"], function() {
-// 	console.log("Production executed!!!");
-// });
+exports.atom = _atomCreateFtpConfig;
+exports.setStamp = setTemplateGenerationStamp;
+exports.init = init;

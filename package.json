@@ -33,12 +33,17 @@
 		"gulp-concat": "^2.6.1",
 		"gulp-download-files": "0.0.3",
 		"gulp-exec": "^4.0.0",
+		"gulp-json-format": "^2.0.0",
 		"gulp-npm-dist": "^1.0.3",
+		"gulp-plumber": "^1.2.1",
 		"gulp-rename": "^1.4.0",
+		"gulp-replace": "^1.0.0",
 		"gulp-sass": "^4.0.2",
 		"gulp-sourcemaps": "^2.6.5",
 		"gulp-uglify": "^3.0.2",
 		"gulp-unzip": "^1.1.0",
+		"inquirer": "^7.0.0",
+		"md5": "^2.2.1",
 		"yargs": "^14.2.0"
 	},
 	"dependencies": {
