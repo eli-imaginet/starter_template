@@ -22,11 +22,10 @@ const gap = require("gulp-append-prepend");
 const md5 = require("md5");
 const replace = require("gulp-replace");
 const inquirer = require("inquirer");
-const ftp = require("ftp-deploy");
 const fs = require("fs");
 const zip = require("zip-lib");
 const wpUrl = "https://wordpress.org/latest.zip";
-const cleanUpDirs = ["./downloads/", "./starter-template", "./wordpress/wp-content/themes/twenty*"];
+const cleanUpDirs = ["./downloads/", "./starter-template", "./wordpress/wp-content/themes/twenty*", "node_modules"];
 const assetsBase = "./wordpress/wp-content/themes/starter-template/assets";
 const templateDir = "./wordpress/wp-content/themes/starter-template";
 const cssHeader = `/*
@@ -63,6 +62,7 @@ const ftpconfig = {
 }
 
 const themeCoreFiles = ['gulpfile.js', 'package-lock.json', 'package.json'];
+const templateAfterGenerationLocation = './wp-content/themes/starter-template';
 
 function notify(notifyObject) {
 	const {
@@ -151,8 +151,8 @@ function js(cb) {
 }
 
 function css(cb) {
-	if (fs.existsSync(`${templateDir}/style.css.map`)) {
-		gulp.src(`${templateDir}/style.css.map`).pipe(clean({
+	if (fs.existsSync(`${templateAfterGenerationLocation}/style.css.map`)) {
+		gulp.src(`${templateAfterGenerationLocation}/style.css.map`).pipe(clean({
 			force: true,
 		}));
 	}
@@ -181,33 +181,27 @@ function _concatCSS() {
 
 
 function setForDeploy(cb) {
-	// zip.archiveFolder('./wordpress/', './deploy.zip').then(() => {
-	// 	notify({
-	// 		successText: 'Hurray, you are ready to deploy, please upload the deploy.zip to the server'
-	// 	});
-	// 	cb();
-	// })
 	gulp.src(themeCoreFiles).pipe(gulp.dest('./wordpress'));
 	cleanGarbage(cb);
 }
 
 function _compileSass(cb) {
 	return gulp
-		.src(`${assetsBase}/scss/style.scss`)
+		.src(`${templateAfterGenerationLocation}/assets/scss/style.scss`)
 		.pipe(plumber({
 			errorHandler: (err) => {
 				global.error = err;
 			}
 		}))
 		.pipe(sourcemaps.init()).on('error', function () {
-			gulp.src(`${assetsBase}/style.css.map`).clean({
+			gulp.src(`${templateAfterGenerationLocation}/style.css.map`).clean({
 				force: true
 			});
 		})
 		.pipe(sass())
 		.pipe(cleanCSS())
 		.pipe(concat("style.css"))
-		.pipe(gulp.dest(templateDir, {
+		.pipe(gulp.dest(templateAfterGenerationLocation, {
 			append: true
 		}))
 		.pipe(sourcemaps.write("./"))
@@ -217,7 +211,7 @@ function _combineCSSAssetsAndCompiledSass(pipe) {
 	pipe.pipe(cleanCSS())
 		.pipe(concat("style.css"))
 		.pipe(sourcemaps.write("./"))
-		.pipe(gulp.dest(templateDir, {
+		.pipe(gulp.dest(templateAfterGenerationLocation, {
 			append: true
 		}))
 		.on("finish", function () {
@@ -246,7 +240,7 @@ function getCurrentTime() {
 
 function watch(cb) {
 	css(cb);
-	gulp.watch(`${assetsBase}/scss/*.scss`, css);
+	gulp.watch(`${templateAfterGenerationLocation}/assets/scss/*.scss`, css);
 }
 
 function downloadWP(cb) {
@@ -364,7 +358,7 @@ templateInit = series(
 	// extractWP,
 	setStarterTemplateInWpContent,
 	moveToAssets,
-	cleanGarbage
+	setForDeploy
 );
 exports.add = add;
 exports.js = js;
