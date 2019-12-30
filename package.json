@@ -49,6 +49,6 @@
     },
     "dependencies": {
         "bootstrap": "<5",
-        "jquery": "<4",
+        "jquery": "<4"
     }
 }
