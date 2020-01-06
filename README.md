@@ -3,6 +3,8 @@ Starter Template
 
 ## Welcome,
 
+*Using This Template Guarantees You The Latest WordPress, Bootstrap, JQuery Versions*
+
 1. Clone the repository
 2. Cd into the cloned folder
 3. Install dependencies by typing in the console `npm install` or `npm ci` the latter is much faster
@@ -19,6 +21,6 @@ Starter Template
 12. Using your editors SASS compiler cd into `/wp-content/themes/starter-template/assets/scss`
 13. Save your style.css => it should compile all the relevant files
 
-*Using This Template Guarantees You The Latest WordPress, Bootstrap, JQuery Versions*
+
 
 ## Loading External Resources
