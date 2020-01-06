@@ -3,7 +3,7 @@
 
 ## Welcome,
 
-*Using This Template Guarantees You The Latest WordPress, Bootstrap, JQuery Versions*
+***Using This Template Guarantees You The Latest WordPress, Bootstrap, JQuery Versions***
 
 1. Clone the repository
 2. Cd into the cloned folder
