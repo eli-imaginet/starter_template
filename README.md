@@ -34,7 +34,7 @@ If your resource should be shared among all pages:
 
 Loading external **CSS** resources
 
-1.Copy your **minified** resource to clipboard
+1. Copy your **minified** resource to clipboard
 2. Paste it in `/wp-content/themes/starter-template/style.css`
 
  
