@@ -12,7 +12,8 @@
 5. Choose your ftp config by editor:  
   VScode => choose `Generate VScode sftpconfig`  
   Atom => choose `Generate Atom ftpconfig`
-6. run `npm run gulp init` again and choose `Initiate the imaginet starter template (Once initiated there is no way back)`
+6. run `npm run gulp init` again and choose  
+  `Initiate the imaginet starter template (Once initiated there is no way back)`
 7. After the build has finished you shall see a `wordpress` directory.
 8. Zip the newly created`wordpress` folder
 9. Upload the zip file to the host
@@ -36,6 +37,6 @@ If your resource should be shared among all pages:
 Loading external **CSS** resources
 
 1. Copy your **minified** resource to clipboard
-2. Paste it in `/wp-content/themes/starter-template/style.css`
+2. Paste it in `/wp-content/themes/starter-template/style.scss`
 
  
