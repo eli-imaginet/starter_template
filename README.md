@@ -16,10 +16,11 @@
 7. After the build has finished you shall see a `wordpress` directory.
 8. Zip the newly created`wordpress` folder
 9. Upload the zip file to the host
-10. install WordPress
-11. Connect to the theme via FTP
-12. Using your editors SASS compiler cd into `/wp-content/themes/starter-template/assets/scss`
-13. Save your style.css => it should compile all the relevant files
+10. Install WordPress
+11. After installation **connect to the admin and choose the starter-template as your theme**
+12. Connect the theme via FTP
+13. Using your editors SASS compiler cd into `/wp-content/themes/starter-template/assets/scss`
+14. Save your style.css => it should compile all the relevant files
 
 
 
