@@ -1,0 +1,51 @@
+{
+	"name": "starter-template",
+	"version": "1.0.0",
+	"description": "This is a Wordpress blank starter theme that works with gulp. ## Installation ### Required * Install last stable version of [node.js](https://nodejs.org/en/). * Install [npm](http://blog.npmjs.org/post/85484771375/how-to-install-npm).   * open node.js command prompt (Run as administration) - it will open \"c:\\Windows\\System32>\"     and Run the command:        * on windows - `npm install npm -g`        * on Mac - `sudo npm install npm -g` * Install [Gulp](http://gulpjs.com/) globally in your system.  Assuming Node.js is installed, open the command line tool, and run the command: `npm install -g gulp`.",
+	"main": "gulpfile.js",
+	"browserslist": [
+		"last 2 version",
+		"> 2%"
+	],
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"gulp": "node node_modules/gulp/bin/gulp.js",
+		"add": "node node_modules/gulp/bin/gulp.js add"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/eli-imaginet/starter_template.git"
+	},
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/eli-imaginet/starter_template/issues"
+	},
+	"homepage": "https://github.com/eli-imaginet/starter_template#readme",
+	"devDependencies": {
+		"colors": "^1.4.0",
+		"gulp": "^4.0.2",
+		"gulp-append-prepend": "^1.0.8",
+		"gulp-autoprefixer": "^7.0.1",
+		"gulp-clean": "^0.4.0",
+		"gulp-clean-css": "^4.2.0",
+		"gulp-cli": "^2.2.0",
+		"gulp-concat": "^2.6.1",
+		"gulp-download-files": "0.0.3",
+		"gulp-exec": "^4.0.0",
+		"gulp-npm-dist": "^1.0.3",
+		"gulp-plumber": "^1.2.1",
+		"gulp-rename": "^1.4.0",
+		"gulp-replace": "^1.0.0",
+		"gulp-sass": "^4.0.2",
+		"gulp-sourcemaps": "^2.6.5",
+		"gulp-uglify": "^3.0.2",
+		"gulp-unzip": "^1.1.0",
+		"inquirer": "^7.0.0",
+		"zip-lib": "^0.5.0"
+	},
+	"dependencies": {
+		"bootstrap": "<5",
+		"jquery": "<4"
+	}
+}
