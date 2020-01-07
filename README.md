@@ -41,6 +41,8 @@ Loading external **CSS** resources
 
 ## Alternate External Resource Loading
 
-Resource can be loaded the conventional way via `wp_register_script` following `wp_enqueue_script`
+Resources can be loaded the conventional way via `wp_register_script` following `wp_enqueue_script`
 And for styles via `wp_register_style` following `wp_enqueue_style`
+
+[https://developer.wordpress.org/reference/functions/wp_enqueue_script/](https://developer.wordpress.org/reference/functions/wp_enqueue_script/)
  
