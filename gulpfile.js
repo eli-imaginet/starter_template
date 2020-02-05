@@ -47,7 +47,7 @@ const ftpconfig = {
 	"user": "{user}",
 	"pass": "{password}",
 	"promptForPass": false,
-	"remote": "/public_html",
+	"remote": "/",
 	"local": "",
 	"secure": false,
 	"secureOptions": null,
@@ -55,9 +55,9 @@ const ftpconfig = {
 	"pasvTimeout": 10000,
 	"keepalive": 10000,
 	"watch": [
-		"/wp-content/themes/starter-template/css/*.css",
-		"/wp-content/themes/starter-template/js/*.js",
-	],
+		"public_html/wp-content/themes/starter-template/assets/scss/*.css",
+		"public_html/wp-content/themes/starter-template/assets/scss/*.scss"
+        ],
 	"watchTimeout": 500
 }
 
