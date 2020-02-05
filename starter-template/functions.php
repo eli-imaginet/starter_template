@@ -22,7 +22,7 @@ define('ENV', 'dev'); // only when developing, after that change it to ''
 if (!defined('TEMPLATEPATH')) {
 	define('TEMPLATEPATH', get_template_directory());
 }
-define('GOOGLE_API_KEY', 'AIzaSyBy6RN81sRyD-Slu8YAXlrV_Qa61Uf1UPI');
+define('GOOGLE_API_KEY', 'SOME_KEY');
 /*****************************************
  **  Includes
  ****************************************/
