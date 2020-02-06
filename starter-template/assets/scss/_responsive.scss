@@ -1,28 +1,10 @@
-// Responsive style
-@import "vars";
-@import "mobile_menu";
-@media only screen and (max-width: 1200px) {
-} /* end of (max-width: 1200px) */
-/****************************************************************************************************************/
+// main: style.scss
 
-@media only screen and (min-width: 1024px) and (max-width: 1440px) {
-    .home {
-        .pros {
-            &__element-container {
-                margin: 10px auto 0;
-            }
-            &__container {
-                padding-bottom: 25px;
-                padding-top: 40px;
-            }
-        }
-        .section-banner {
-            .inner-width {
-                margin-top: 90px;
-            }
-        }
+@media only screen and (max-width: 1200px) {
+    body{
+        background-color: green;
     }
-} /* end of (max-width: 1024px) */
+} /* end of (max-width: 1200px) */
 /****************************************************************************************************************/
 
 @media only screen and (max-width: 768px) {

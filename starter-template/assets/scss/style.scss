@@ -1,8 +1,9 @@
 // Theme Main Style
 // Put all your custom css here...
-@import url("https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700");
-@import "vars";
-@import "responsive";
+@import url("https://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Roboto:400,700&display=swap");
+@import "_vars.scss";
+@import "_responsive.scss";
+@import "_mobile_menu.scss";
 
 /* Defaults
 -------------------------------------------------------------- */
@@ -162,6 +163,14 @@ img.grayscale:hover {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+header{
+    position: fixed;
+    left: 0;
+    right: 0;
+    background-color: #000;
+    opacity: 0.5;
+    z-index: 5555555;
 }
 
 /** Main Menu */

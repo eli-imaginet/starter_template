@@ -1,18 +1,18 @@
-// colors
+// main: style.scss
 
-$primary-color: #3497ef;
-$text-color: #363636;
+$primary-color: #ED802D;
+$text-color: #231F20;
 $blue-color: #002f82;
-$blue-color2: #274095;
-$light-blue-color: #1f72b6;
-$orange-color: #f7911f;
-$gray-color: #888888;
-$figure-color: #004474;
+// $blue-color2: #274095;
+// $light-blue-color: #1f72b6;
+// $orange-color: #f7911f;
+// $gray-color: #888888;
+// $figure-color: #004474;
 
 // Fonts
 
-$main-font-family: "Montserrat",
-sans-serif;
+$title-font-family: "Roboto Slab", sans-serif;
+$main-font-family: "Roboto", sans-serif;
 
 @mixin font-regular {
     font-family: $main-font-family;
