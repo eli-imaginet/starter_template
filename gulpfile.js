@@ -71,7 +71,7 @@ const sftpConfig = {
 	"remotePath": "",
 	"uploadOnSave": true,
 	"watcher": {
-		"files": "wp-content/themes/starter-template/assets/scss/*.{css,map}",
+		"files": "assets/scss/*.{css,map}",
 		"autoUpload": true,
 		"autoDelete": false
 	},
