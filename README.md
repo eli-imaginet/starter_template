@@ -25,21 +25,7 @@
 
 
 
-## Loading External Resources
-
-Loading external **JS** resources should be done with caution:
-
-If your resource should be shared among all pages:
-
-1. Copy your **minified** resource to clipboard
-2. Paste it in the `/wp-content/themes/starter-template/assets/js/assets.min.js`
-
-Loading external **CSS** resources
-
-1. Copy your **minified** resource to clipboard
-2. Paste it in `/wp-content/themes/starter-template/style.scss`
-
-## Alternate External Resource Loading
+## External Resource Loading
 
 Resources can be loaded the conventional way via `wp_register_script` following `wp_enqueue_script`
 And for styles via `wp_register_style` following `wp_enqueue_style`
