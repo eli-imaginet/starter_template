@@ -30,13 +30,15 @@ const assetsBase = "./wordpress/wp-content/themes/starter-template/assets";
 const templateDir = "./wordpress/wp-content/themes/starter-template";
 const cssHeader = `/*
 	Theme Name: Starter Template
-	Version: 1.0
+	Version: 1.1
 	Author: Imaginet Studio
 */`;
 const coreJsResources = [
-	`./${assetsBase}/jquery/jquery.min.js`,
+	// `./${assetsBase}/jquery/jquery.min.js`,
 	// `./${assetsBase}/bootstrap/js/bootstrap.min.js`
 ];
+const jqueryPath = `./${assetsBase}/jquery/jquery.min.js`;
+
 const coreCssResources = [
 	`${assetsBase}/bootstrap/css/bootstrap.min.css`
 ];
@@ -157,13 +159,15 @@ function moveToAssets(cb) {
 }
 
 function js(cb) {
-	gulp.src(coreJsResources)
-		.pipe(concat("assets.min.js"))
-		.pipe(uglify())
+	// gulp.src(coreJsResources)
+	gulp.src(jqueryPath)
+		// .pipe(concat("assets.min.js"))
+		// .pipe(uglify())
 		.pipe(gulp.dest(`${assetsBase}/js`))
 		.on("finish", () => {
 			notify({
-				successText: 'Assets Moved!'
+				// successText: 'Assets Moved!'
+				successText: 'jQuery moved!'
 			});
 			cb();
 		});
