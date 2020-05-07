@@ -2,6 +2,7 @@
 
 ### Release Notes  
 fixed jQuery deregister bug
+added home template
 
 ## Welcome,
 
@@ -24,6 +25,11 @@ fixed jQuery deregister bug
 12. Connect the theme via FTP
 13. Using your editors SASS compiler cd into `/wp-content/themes/starter-template/assets/scss`
 14. Save your style.css => it should compile all the relevant files
+
+
+*** Adding new pages / templates ***
+Each page/template should have a wrapping div for consistency, the best example is the homepage which is located
+in page-templates
 
 
 
