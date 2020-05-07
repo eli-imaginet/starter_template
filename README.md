@@ -27,7 +27,8 @@ added home template
 14. Save your style.css => it should compile all the relevant files
 
 
-*** Adding new pages / templates ***
+***Adding new pages / templates***
+
 Each page/template should have a wrapping div for consistency, the best example is the homepage which is located
 in page-templates
 
