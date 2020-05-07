@@ -11,7 +11,7 @@ added home template @1.02
 
 1. Clone the repository
 2. Cd into the cloned folder
-3. Install dependencies by typing in the console `npm install` or `npm ci` the latter is much faster
+3. Install dependencies by typing in the console `npm i`
 4. run `npm run gulp init`
 5. Choose your ftp config by editor:  
   VSCode => choose `Generate VSCode sftpconfig`  
