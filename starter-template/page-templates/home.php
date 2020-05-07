@@ -1,4 +1,6 @@
 <?php //Template Name: Home?>
 <?php get_header()?>
-Hello from home
+<div class="page-wrap homepage">
+  Hello from home
+</div>
 <?php get_footer()?>
