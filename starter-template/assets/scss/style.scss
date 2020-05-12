@@ -276,5 +276,6 @@ ul#main-menu ul.sub-menu li:hover>a {
 }
 
 /* Edit Above Only*/
-@import "_responsive.scss";
+
 @import "_mobile_menu.scss";
+@import "_responsive.scss";
