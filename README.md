@@ -5,6 +5,8 @@ fixed jQuery deregister bug @1.01
 
 added home template @1.02
 
+fixed cascading rules with responsive scss @1.02
+
 ## Welcome,
 
 ***Using This Template Guarantees You The Latest WordPress, Bootstrap, JQuery Versions***
