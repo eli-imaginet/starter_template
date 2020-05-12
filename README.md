@@ -5,7 +5,7 @@ fixed jQuery deregister bug @1.01
 
 added home template @1.02
 
-fixed cascading rules with responsive scss @1.02
+fixed cascading rules with responsive scss @1.03
 
 ## Welcome,
 
