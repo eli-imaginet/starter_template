@@ -1,4 +1,4 @@
-# Imaginet's Starter @1.0.2
+# Imaginet's Starter @1.0.3
 
 ### Release Notes  
 fixed jQuery deregister bug @1.01
