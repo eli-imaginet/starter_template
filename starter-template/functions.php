@@ -118,6 +118,13 @@ if (!function_exists('add_body_class')) {
 	add_filter('body_class', 'add_body_class');
 }
 
+// woocommerce activation snippet
+
+// function mytheme_add_woocommerce_support() {
+//   add_theme_support( 'woocommerce' );
+// }
+// add_action( 'after_setup_theme', 'mytheme_add_woocommerce_support' );
+
 // initialize ACF Google Maps API
 function my_acf_init()
 {
