@@ -24,10 +24,11 @@ define('GOOGLE_API_KEY', 'SOME_KEY');
  **  Includes
  ****************************************/
 get_template_part("includes/enqueue");
+get_template_part("includes/types-and-taxonomies");
 // get_template_part("functions/tgm");
 // get_template_part("functions/shortcodes");
 // get_template_part("functions/ajax");
-// get_template_part("admin/types-and-taxonomies");
+
 /*****************************************
  **  Theme Support
  *****************************************/
