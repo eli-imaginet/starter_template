@@ -1,5 +1,8 @@
 const gulp = require('gulp');
-const { series, parallel } = require('gulp');
+const {
+	series,
+	parallel
+} = require('gulp');
 const colors = require('colors');
 const exec = require('child_process').exec;
 const npmDist = require('gulp-npm-dist');
@@ -22,7 +25,7 @@ const inquirer = require('inquirer');
 const fs = require('fs');
 const zip = require('zip-lib');
 const wpUrl = 'https://wordpress.org/latest.zip';
-const cleanUpDirs = [ './downloads/', './starter-template', './wordpress/wp-content/themes/twenty*' ];
+const cleanUpDirs = ['./downloads/', './starter-template', './wordpress/wp-content/themes/twenty*'];
 const assetsBase = './wordpress/wp-content/themes/starter-template/assets';
 const templateDir = './wordpress/wp-content/themes/starter-template';
 const cssHeader = `/*
@@ -30,13 +33,11 @@ const cssHeader = `/*
 	Version: 1.1
 	Author: Imaginet Studio
 */`;
-const coreJsResources = [
-	// `./${assetsBase}/jquery/jquery.min.js`,
-	// `./${assetsBase}/bootstrap/js/bootstrap.min.js`
-];
 const jqueryPath = `./${assetsBase}/jquery/jquery.min.js`;
+const htaccessTemplate = `Options -Indexes`;
+const htaccessPath = './wordpress/wp-content/uploads';
 
-const coreCssResources = [ `${assetsBase}/bootstrap/css/bootstrap.min.css` ];
+const coreCssResources = [`${assetsBase}/bootstrap/css/bootstrap.min.css`];
 const ftpconfig = {
 	protocol: 'ftp',
 	host: '{host}',
@@ -73,15 +74,19 @@ const sftpConfig = {
 		autoDelete: false
 	},
 	remoteExplorer: {
-		filesExclude: [ 'node_modules' ]
+		filesExclude: ['node_modules']
 	}
 };
 
-const themeCoreFiles = [ 'gulpfile.js', 'package-lock.json', 'package.json' ];
+const themeCoreFiles = ['gulpfile.js', 'package-lock.json', 'package.json'];
 const templateAfterGenerationLocation = './wp-content/themes/starter-template';
 
 function notify(notifyObject) {
-	const { errorText, instructions, successText } = notifyObject;
+	const {
+		errorText,
+		instructions,
+		successText
+	} = notifyObject;
 	console.log('\033[2J');
 	if (successText) {
 		console.log(successText.bold.white.bgGreen + '\n');
@@ -94,40 +99,6 @@ function notify(notifyObject) {
 	}
 }
 
-function add(cb) {
-	const packageName = argv.p || null;
-	if (!packageName) {
-		const notifyObject = {
-			errorText: 'Please Provide A Valid NPM Package Name!',
-			instructions: 'Should be executed as: ' + '\n' + 'npm run add -- -p={packgage-name}'
-		};
-		notify(notifyObject);
-		cb();
-		return;
-	}
-	exec(`npm i ${packageName}`, function(err, stdout, stderr) {
-		console.log(stdout);
-		console.log(stderr);
-		gulp
-			.src(npmDist(), {
-				base: './node_modules'
-			})
-			.pipe(
-				rename((path) => {
-					path.dirname = path.dirname.replace(/\/dist/, '').replace(/\\dist/, '');
-				})
-			)
-			.pipe(gulp.dest(assetsBase + '/js/'));
-		notify({
-			successText: `Package ${packageName} successfully installed and moved to assets dir`,
-			instructions:
-				`Please don't forget to add your file to core resource arrays and run:` +
-				'\n' +
-				'npm run gulp compileAll'
-		});
-		cb();
-	});
-}
 
 function moveToAssets(cb) {
 	gulp
@@ -142,7 +113,7 @@ function moveToAssets(cb) {
 		.pipe(
 			gulp.dest(assetsBase).on(
 				'end',
-				function() {
+				function () {
 					js(cb);
 				}.bind(null, cb)
 			)
@@ -150,15 +121,11 @@ function moveToAssets(cb) {
 }
 
 function js(cb) {
-	// gulp.src(coreJsResources)
 	gulp
 		.src(jqueryPath)
-		// .pipe(concat("assets.min.js"))
-		// .pipe(uglify())
 		.pipe(gulp.dest(`${assetsBase}/js`))
 		.on('finish', () => {
 			notify({
-				// successText: 'Assets Moved!'
 				successText: 'jQuery moved!'
 			});
 			cb();
@@ -174,13 +141,6 @@ function css(cb) {
 		);
 	}
 	_concatCSS().on('finish', cb);
-	// .on(
-	// 	"finish",
-	// 	function () {
-	// 		// _combineCSSAssetsAndCompiledSass(_compileSass());
-	// 		cb();
-	// 	}.bind(null, cb)
-	// );
 }
 
 function _concatCSS(cb) {
@@ -202,70 +162,6 @@ function setForDeploy(cb) {
 	cleanGarbage(cb);
 }
 
-function _compileSass(cb) {
-	return gulp
-		.src(`${templateAfterGenerationLocation}/assets/scss/style.scss`)
-		.pipe(
-			plumber({
-				errorHandler: (err) => {
-					global.error = err;
-				}
-			})
-		)
-		.pipe(sourcemaps.init())
-		.on('error', function() {
-			gulp.src(`${templateAfterGenerationLocation}/style.css.map`).clean({
-				force: true
-			});
-		})
-		.pipe(sass())
-		.pipe(cleanCSS())
-		.pipe(concat('style.css'))
-		.pipe(
-			gulp.dest(templateAfterGenerationLocation, {
-				append: true
-			})
-		)
-		.pipe(sourcemaps.write('./'));
-}
-
-function _combineCSSAssetsAndCompiledSass(pipe) {
-	pipe
-		.pipe(cleanCSS())
-		.pipe(concat('style.css'))
-		.pipe(sourcemaps.write('./'))
-		.pipe(
-			gulp.dest(templateAfterGenerationLocation, {
-				append: true
-			})
-		)
-		.on('finish', function() {
-			if (!global.error) {
-				notify({
-					successText: `Scss compiled Successfully at ${getCurrentTime()}`
-				});
-			} else {
-				notify({
-					errorText: global.error.formatted
-				});
-			}
-			delete global.error;
-		});
-}
-
-function getCurrentTime() {
-	const date = new Date();
-	const minutes = date.getMinutes();
-	const hours = date.getHours();
-	const seconds = date.getSeconds();
-	return ` ${hours}:${minutes < 10 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds} `.bold.bgGray
-		.white;
-}
-
-function watch(cb) {
-	css(cb);
-	gulp.watch(`${templateAfterGenerationLocation}/assets/scss/*.scss`, css);
-}
 
 function downloadWP(cb) {
 	if (!fs.existsSync('./downloads/latest.zip')) {
@@ -275,9 +171,6 @@ function downloadWP(cb) {
 	cb();
 }
 
-function extractWP(cb) {
-	gulp.src('./wordpress/**').pipe(gulp.dest('./')).on('finish', cb);
-}
 
 function unzipWP(cb) {
 	gulp.src('./downloads/latest.zip').pipe(unzip()).pipe(gulp.dest('./')).on('finish', cb);
@@ -285,7 +178,7 @@ function unzipWP(cb) {
 
 function cleanGarbage(cb) {
 	gulp
-		.src([ ...cleanUpDirs, ...themeCoreFiles ])
+		.src([...cleanUpDirs, ...themeCoreFiles])
 		.pipe(
 			clean({
 				force: true
@@ -302,29 +195,30 @@ function setStarterTemplateInWpContent(cb) {
 }
 
 function _atomCreateFtpConfig(cb) {
-	// inquirer.prompt({
-	// 	type: 'confirm',
-	// 	name: 'a',
-	// 	message: 'Did you copy the template to the server first?'
-	// }).then(function (a) {
-	// 	if (!a.a) {
-	// 		cb();
-	// 		notify({
-	// 			errorText: `.ftpconfig shoud be generated only after the template files were copied to the server and all server configuration has been made`,
-	// 		});
-	// 		return;
-	// 	}
 	fs.writeFile(`./.ftpconfig`, JSON.stringify(ftpconfig, null, 4), cb);
 	notify({
 		successText: `.ftpconfig was generated at theme folder, please edit the file and fulfill the ftp credentials`
 	});
-	// })
+}
+
+function _createUploadsHtaccess(cb) {
+	fs.mkdir(
+		htaccessPath,
+		function (err, stdout, stderr) {
+			if (!err) {
+				fs.writeFile(`${htaccessPath}/.htaccess`, htaccessTemplate, cb);
+				notify({
+					successText: `.htaccess was created in uploads dir -- security measure`
+				});
+			}
+		}.bind(cb)
+	);
 }
 
 function _codeCreateSftpConfig(cb) {
 	fs.mkdir(
 		'./.vscode',
-		function(err, stdout, stderr) {
+		function (err, stdout, stderr) {
 			if (!err) {
 				fs.writeFile(`./.vscode/sftp.json`, JSON.stringify(sftpConfig, null, 4), cb);
 				notify({
@@ -336,31 +230,24 @@ function _codeCreateSftpConfig(cb) {
 }
 
 function init(cb) {
-	const q = [
-		{
-			type: 'list',
-			name: 'action',
-			message: 'What would you like to do today?',
-			choices: [
-				{
-					name: 'Initiate the imaginet starter template (Once initiated there is no way back)',
-					value: 1
-				},
-				{
-					name: 'Generate Atom ftpconfig',
-					value: 2
-				},
-				{
-					name: 'Generate VScode sftpconfig',
-					value: 3
-				}
-				// {
-				// 	name: 'I am ready to deploy',
-				// 	value: 4
-				// }
-			]
-		}
-	];
+	const q = [{
+		type: 'list',
+		name: 'action',
+		message: 'What would you like to do today?',
+		choices: [{
+				name: 'Initiate the imaginet starter template (Once initiated there is no way back)',
+				value: 1
+			},
+			{
+				name: 'Generate Atom ftpconfig',
+				value: 2
+			},
+			{
+				name: 'Generate VScode sftpconfig',
+				value: 3
+			}
+		]
+	}];
 	inquirer.prompt(q).then((answer) => {
 		switch (answer.action) {
 			case 1:
@@ -372,25 +259,16 @@ function init(cb) {
 			case 3:
 				_codeCreateSftpConfig(cb);
 				break;
-			// case 4:
-			// 	setForDeploy(cb);
-			// 	break;
 		}
 	});
 }
 templateInit = series(
 	downloadWP,
 	unzipWP,
-	// extractWP,
 	setStarterTemplateInWpContent,
 	moveToAssets,
 	css,
-	setForDeploy
+	setForDeploy,
+	_createUploadsHtaccess
 );
-// exports.add = add;
-// exports.js = js;
-// exports.css = css;
-// exports.watch = watch;
-// exports.atom = _atomCreateFtpConfig;
 exports.init = init;
-// exports.clean = cleanGarbage;
