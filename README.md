@@ -1,4 +1,4 @@
-# Imaginet's Starter @1.0.4
+# Imaginet's Starter @1.0.5
 
 ### Release Notes  
 fixed jQuery deregister bug @1.01
@@ -8,6 +8,8 @@ added home template @1.02
 fixed cascading rules with responsive scss @1.03
 
 added types and taxonomies scss @1.04
+
+added wp-content/uploads .htaccess @1.05
 
 ## Welcome,
 
